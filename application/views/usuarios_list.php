@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
 <style>
     #btnBack,
@@ -22,12 +23,32 @@
     }
 
     body {
-        background-color: #659c6b;  
+        background-color: #659c6b;
     }
 
     .card {
         padding: 2%;
     }
+
+    .dataTables_filter {
+        margin-bottom: 10px !important;
+    }
+
+    .buttons-copy {
+        background-color: #6c757d !important;
+        color: white !important;
+    }
+
+    .buttons-pdf {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+
+    .buttons-print {
+        background-color: #000 !important;
+        color: white !important;
+    }
+
 </style>
 
 <body>
@@ -36,7 +57,7 @@
             <div class="row mt-5">
                 <div class="col-12">
                     <div class="card shadow rounded mb-5">
-                        <h4 class="text-center card-header">Módulo de Usuarios</h4>
+                        <h4 class="text-center card-header">Módulo de Usuarios <i class="fa fa-user"></i></h4>
                         <div class="row">
                             <div class="mt-2">
                                 <div class="col">
@@ -49,7 +70,7 @@
                                 <div class="col mt-2">
                                     <label for="buscador" class="form-label">Búsqueda por correo</label>
                                     <div class="input-group">
-                                        <input id="buscador" type="text" class="form-control" placeholder="Ingrese el correo, ej: correo@email.com"/>
+                                        <input id="buscador" type="text" class="form-control" placeholder="Ingrese el correo, ej: correo@email.com" />
                                         <button class="input-group-addon btn btn-secondary" id="search" type="reset">
                                             Buscar <i class="fa fa-search"></i>
                                         </button>
@@ -118,10 +139,10 @@
                                 <table id="usersTable" class="table table-hover table-striped text-center">
                                     <thead>
                                         <tr>
-                                            <th style="background-color: #32a852 !important; color: white;">ID</th>
-                                            <th style="background-color: #32a852 !important; color: white;">Nombre</th>
-                                            <th style="background-color: #32a852 !important; color: white;">Correo</th>
-                                            <th style="background-color: #32a852 !important; color: white;">Estatus</th>
+                                            <th style="background-color: #32a852 !important; color: white; text-align: center;">ID</th>
+                                            <th style="background-color: #32a852 !important; color: white; text-align: center;">Nombre</th>
+                                            <th style="background-color: #32a852 !important; color: white; text-align: center;">Correo</th>
+                                            <th style="background-color: #32a852 !important; color: white; text-align: center;">Estatus</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbody">
@@ -140,6 +161,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!--DATATABLE -->
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.colVis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
     <script>
         // Buscar
         $(document).on("click", "#search", function(event) {
@@ -190,10 +219,6 @@
             });
         });
 
-        $("#btnBack").click(function() {
-            alert("Prueba");
-        });
-
         $(document).on("click", "#btnBack", function(e) {
             e.preventDefault();
 
@@ -227,6 +252,7 @@
                     if (data.response == "success") {
                         //alert(data.message);
                         Swal.fire('Usuario registrado', 'La información del usuario ha sido registrada con éxito.', 'success')
+                        $('#usersTable').DataTable().destroy();
                         getAllUsers();
                     } else {
                         //alert(data.message)
@@ -267,6 +293,39 @@
                     }
 
                     $("#tbody").html(tbody);
+                    // Destruir datatable
+                    //$('#usersTable').DataTable().destroy();
+                    // Inicializar Datatable
+                    $('#usersTable').DataTable({
+                        language: {
+                            url: 'https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json',
+                        },
+                        pagingType: 'full_numbers',
+                        responsive: true,
+                        dom: 'Blfrtip',
+                        buttons: [{
+                                extend: 'copy',
+                                text: '<i class="fa fa-copy"></i> ',
+                                titleAttr: 'Copiar contenido',
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="fa fa-file-excel-o"></i> ',
+                                titleAttr: 'Exportar a Excel',
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="fa fa-file-pdf-o"></i> ',
+                                titleAttr: 'Exportar a PDF',
+                            },
+                            {
+                                extend: 'print',
+                                text: '<i class="fa fa-print"></i> ',
+                                titleAttr: 'Imprimir',
+                            },
+                        ],
+
+                    });
                 }
             });
         }
@@ -294,6 +353,7 @@
                     $('#nombre_actualizado').val(data.nombre);
                     $('#correo_actualizado').val(data.correo);
                     $('#contrasenia_actualizado').val(data.contrasenia);
+                    $('#usersTable').DataTable().destroy();
                     getAllUsers();
                 }
             });
@@ -331,6 +391,7 @@
                         $('#editModal').modal('hide');
                         if (data.response == "success") {
                             Swal.fire('Usuario modificado', 'La información del usuario se actualizó con éxito', 'success')
+                            $('#usersTable').DataTable().destroy();
                             getAllUsers();
                         } else {
                             Swal.fire('Usuario no modificado', 'La información del usuario no ha sido modificada', 'info')
@@ -367,6 +428,7 @@
                             id: id
                         },
                         success: function(data) {
+                            $('#usersTable').DataTable().destroy();
                             getAllUsers();
                         }
                     });
@@ -405,6 +467,7 @@
                             id: id
                         },
                         success: function(data) {
+                            $('#usersTable').DataTable().destroy();
                             getAllUsers();
                         }
                     });
